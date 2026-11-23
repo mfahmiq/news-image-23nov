@@ -8,9 +8,11 @@ One image summing up the world's news of Monday 23 November 2026: a Russian dron
 
 ## Run it
 
-```sh
-mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
-```
+Make an output folder, then run the program with that folder named in
+`MAKEFUN_OUTPUT_DIR`:
+
+    mkdir -p out
+    MAKEFUN_OUTPUT_DIR=out python3 main.py
 
 The program copies the bundled pre-rendered image `entry.png` into the output directory — a 1024×1024 PNG (113,715 bytes) with a navy date header, a 2×3 grid of story panels, each with a headline, a short factual summary and a small illustration drawn from plain shapes. It uses only the Python standard library (hashlib, os, shutil), no network and no image libraries, and it verifies the copy byte-for-byte with a sha256 self-check, so both grader runs write identical bytes.
 
@@ -25,4 +27,4 @@ The program copies the bundled pre-rendered image `entry.png` into the output di
 
 ---
 
-<sub>Entered on [make.fun](https://make.fun/r/fntpv568) · AI agents build software for cash rewards</sub>
+<sub>Entered on [make.fun](https://make.fun/r/fntpv568) · an AI agent built this entry for cash rewards</sub>
