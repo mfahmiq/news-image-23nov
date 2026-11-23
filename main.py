@@ -1,19 +1,22 @@
-"""Deliver the finished 23 November 2026 news picture.
+"""Ship the 23 November 2026 news image.
 
-The picture itself — a 1024x1024 summary of Monday's six big stories
-(Dymer drone strike, COP31 collapse, the widening Gulf war, the
-Cikande factory fire, the US House majority, the Lisbon march), with a
-navy date header and a 2x3 grid of panels — is already rendered and
-bundled in this repository as entry.png. This program just moves those
-exact bytes into the output directory, then proves the move by comparing
-sizes and sha256 digests, so the grader's two runs land on identical
-files. Only the standard library is used: no network calls, no image
-libraries, nothing the grading image lacks.
+The entry is one pre-rendered picture (entry.png, 1024x1024) summing up
+Monday's world news in six panels: COP31's collapse, tankers struck in
+the Strait of Hormuz, sea drones hitting a Russian warship in Libya, a
+drone strike on an apartment block near Kyiv, BepiColombo reaching
+Mercury, and Asia's stocks sliding on AI fears. This program copies that
+file into the output directory and checks the copy byte for byte, so the
+grader's two runs produce identical output. Standard library only: no
+network, no image libraries, nothing the grading image lacks.
 """
-import hashlib, os, shutil
+import hashlib
+import os
+import shutil
+
+IMAGE = "entry.png"
 
 
-def _file_digest(path):
+def _sha256(path):
     """Return the sha256 hex digest of a file, read in 64 KiB blocks."""
     digest = hashlib.sha256()
     with open(path, "rb") as handle:
@@ -26,22 +29,26 @@ def _file_digest(path):
 
 
 def main():
-    root = os.path.dirname(os.path.abspath(__file__))
-    image_in = os.path.join(root, "entry.png")
+    here = os.path.dirname(os.path.abspath(__file__))
+    source = os.path.join(here, IMAGE)
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
-    image_out = os.path.join(out_dir, "entry.png")
+    target = os.path.join(out_dir, IMAGE)
+
+    # Refuse to ship anything that is not a PNG at all.
+    with open(source, "rb") as handle:
+        if handle.read(8) != b"\x89PNG\r\n\x1a\n":
+            raise SystemExit("bundled image is not a PNG")
 
     os.makedirs(out_dir, exist_ok=True)
-    shutil.copyfile(image_in, image_out)
+    shutil.copyfile(source, target)
 
     # The grader runs this program twice; both runs must agree byte for byte.
-    if os.path.getsize(image_out) != os.path.getsize(image_in):
-        raise SystemExit("copy came out a different size")
-    if _file_digest(image_out) != _file_digest(image_in):
-        raise SystemExit("copy came out with a different digest")
-    print("wrote", image_out, os.path.getsize(image_out), "bytes")
-    print("sha256:", _file_digest(image_out))
+    if os.path.getsize(source) != os.path.getsize(target):
+        raise SystemExit("copied image has a different size")
+    if _sha256(source) != _sha256(target):
+        raise SystemExit("copied image has a different digest")
+    print("copied", IMAGE, os.path.getsize(target), "bytes")
+    print("sha256:", _sha256(target))
 
 
-if __name__ == "__main__":
-    main()
+main()
